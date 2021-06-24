@@ -1,38 +1,47 @@
-def gv
-
 pipeline {
-    agent any
-    stages {
-        stage("init") {
-            steps {
-                script {
-                    gv = load "script.groovy"
+    agent any 
+
+    tools {
+        maven 'Maven'
+    }
+
+        stages {
+
+            stage("Build jar") {
+                steps {
+                    script {
+                        echo "Building the application..."
+                        sh 'mvn package'
+                    }
                 }
             }
-        }
-        stage("build jar") {
-            steps {
-                script {
-                    echo "building jar"
-                    //gv.buildJar()
+            stage("build image") {
+
+                steps {
+
+                    script {
+                        echo "Building the docker image..."
+                        withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
+                            sh 'docker build -t thiringai/docker-test:jma-2.0 .'
+                            sh "docker login -u $USER -p $PASS"
+                            sh 'docker push thiringai/docker-test:jma-2.0'
+                        }
+                    }
+                
                 }
+
+            }
+
+            stage("deploy") {
+
+                steps {
+
+                    script {
+                        echo "deploying the application..."
+                    }
+
+                }
+
             }
         }
-        stage("build image") {
-            steps {
-                script {
-                    echo "building image"
-                    //gv.buildImage()
-                }
-            }
-        }
-        stage("deploy") {
-            steps {
-                script {
-                    echo "deploying"
-                    //gv.deployApp()
-                }
-            }
-        }
-    }   
 }
