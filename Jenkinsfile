@@ -7,7 +7,20 @@ pipeline {
 
         stages {
 
-            stage("Build jar") {
+            stage("increment version") {
+                steps {
+                    script {
+                        echo "Incrementing app version..."
+                        sh 'mvn build-helper:parse-version versions:set \ 
+                            -DnewVersion=\\\${parsedVersion.majorVersion}.\\\${parsedVersion.minorVersion}.\\\${parsedVersion.nextIncrementalVersion} versions:commit'
+                        def matcher = readFile('pom.xml') =~ '<version>(.+)</version>'
+                        def version = matcher[0][1]
+                        env.IMAGE_NAME = "$version-$BUILD_NUMBER"
+                    }
+                }
+            }
+
+            stage("Build app") {
                 steps {
                     script {
                         echo "Building the application..."
@@ -22,9 +35,9 @@ pipeline {
                     script {
                         echo "Building the docker image..."
                         withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
-                            sh 'docker build -t thiringai/docker-test:jma-2.0 .'
+                            sh "docker build -t thiringai/docker-test:${IMAGE_NAME} ."
                             sh "docker login -u $USER -p $PASS"
-                            sh 'docker push thiringai/docker-test:jma-2.0'
+                            sh "docker push thiringai/docker-test:${IMAGE_NAME}"
                         }
                     }
                 
