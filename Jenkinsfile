@@ -62,13 +62,13 @@ pipeline {
                         withCredentials([usernamePassword(credentialsId: 'github-creds', passwordVariable: 'PASS', usernameVariable: 'USER')]) {
                             sh 'git config --global user.email "jenkins@example.com"'
                             sh 'git config --global user.name "jenkins"'
-                            sh 'git config --global --unset https.proxy'
+                           
                             
                             sh 'git status'
                             sh 'git branch'
                             sh 'git config --list'
                             
-                            sh "git remote set-url origin https://${USER}:${PASS}@github.com/thiringai-evans/jenkins-repo.git"
+                            sh "git remote add origin https://${USER}:${PASS}@github.com/thiringai-evans/jenkins-repo.git"
                             sh 'git add .'
                             sh 'git commit -m "jenkinsci: version increment"'
                             sh 'git push origin HEAD:master'
