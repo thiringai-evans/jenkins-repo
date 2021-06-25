@@ -70,7 +70,7 @@ pipeline {
                             sh "git remote set-url origin https://${USER}:${PASS}@github.com/thiringai-evans/jenkins-repo.git"
                             sh 'git add .'
                             sh 'git commit -m "jenkinsci: version increment"'
-                            sh 'git push'
+                            sh 'git push origin master'
                         }
                     }
                 }
