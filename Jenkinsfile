@@ -68,7 +68,7 @@ pipeline {
                             sh 'git branch'
                             sh 'git config --list'
                             
-                            sh "git remote set-url origin https://github.com/thiringai-evans/jenkins-repo"
+                            sh "git remote set-url https://{USER}:{PASS}@github.com/{USER}/jenkins-repo.git"
                           
                             sh 'git add .'
                             sh 'git commit -m "version increment"'
